@@ -30,7 +30,7 @@ const findOneOrFail = async (id: number): Promise<Wilder> => {
  */
 const create = async (wilder: WilderType): Promise<Wilder | null> => {
   const newWilder: Wilder = await repository.save(wilder);
-  if (wilder.skills.length > 0) {
+  if (wilder.skills !== undefined && wilder.skills.length > 0) {
     await Promise.all(
       wilder.skills.map(async (skill: Skills) => {
         const grade = new Grade();
@@ -63,9 +63,11 @@ const update = async (id: number, data: WilderType): Promise<Wilder | null> => {
 
     const array = wilder.grades.map((grade: Grade) => grade.skill.id);
 
-    for await (const skill of data.skills) {
-      if (!array.includes(skill.id)) {
-        newSkill.push(skill);
+    if (data.skills !== undefined && data.skills.length > 0) {
+      for await (const skill of data.skills) {
+        if (!array.includes(skill.id)) {
+          newSkill.push(skill);
+        }
       }
     }
 
@@ -80,7 +82,10 @@ const update = async (id: number, data: WilderType): Promise<Wilder | null> => {
 
     // Suppression
 
-    const skillData = data.skills.map((skill: Skills) => skill.id);
+    const skillData =
+      data.skills !== undefined
+        ? data.skills.map((skill: Skills) => skill.id)
+        : [];
     const wilderGrades = wilder.grades.map((grade: Grade) => {
       return {
         gradeId: grade.id,
@@ -109,7 +114,13 @@ const update = async (id: number, data: WilderType): Promise<Wilder | null> => {
  * @return Promise<DeleteResult>
  */
 const remove = async (id: number): Promise<DeleteResult> => {
-  return await repository.delete(id);
+  const wilder = await findOneOrFail(id);
+  if (wilder !== null) {
+    return await repository.delete(id);
+  } else {
+    // eslint-disable-next-line prefer-promise-reject-errors
+    return await Promise.reject("Wilder not found");
+  }
 };
 
 export default {
@@ -125,5 +136,5 @@ export interface WilderType {
   lastname: string;
   description: string;
   avatar: string;
-  skills: Skills[];
+  skills?: Skills[];
 }

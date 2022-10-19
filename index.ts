@@ -1,24 +1,28 @@
-import express from "express";
-import WilderController from "./src/controllers/WilderController";
-import SkillController from "./src/controllers/SkillController";
-import GradeController from "./src/controllers/GradeController";
+import "reflect-metadata";
+import WilderResolver from "./src/resolvers/WilderResolver";
+import SkillResolver from "./src/resolvers/SkillResolver";
+import { ApolloServer } from "apollo-server";
 import datasource from "./src/utils";
-import cors from "cors";
-const app = express();
+import { buildSchema } from "type-graphql";
+import GradeResolver from "./src/resolvers/GradeResolver";
 
-app.use(express.json());
-app.use(
-  cors({
-    origin: ["http://localhost:3000"],
-  })
-);
-
-app.use("/api/wilders", WilderController);
-app.use("/api/skills", SkillController);
-app.use("/api/grades", GradeController);
-
-// Ecoute du serveur
-app.listen(8000, async () => {
+const init = async (): Promise<void> => {
   await datasource.initialize();
-  console.log("Server running on port 8000");
-});
+  const schema = await buildSchema({
+    resolvers: [WilderResolver, SkillResolver, GradeResolver],
+  });
+  const server = new ApolloServer({
+    schema,
+  });
+  // Ecoute du serveur
+  await server
+    .listen({ port: 8000 })
+    .then(async ({ url }) => {
+      console.log(`🚀 Server ready at ${url}`);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+void init();

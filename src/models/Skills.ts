@@ -1,14 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
-import Grade from "./Grade";
+import { Field, ObjectType } from "type-graphql";
+import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 
+@ObjectType()
 @Entity()
 export default class Skills {
   @PrimaryGeneratedColumn()
+  @Field()
   id: number;
 
+  @Field()
   @Column({ length: 50, type: "varchar" })
   name: string;
-
-  @OneToMany(() => Grade, (grade) => grade.skill)
-  grades: Grade[];
 }

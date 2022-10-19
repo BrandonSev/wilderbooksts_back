@@ -1,3 +1,4 @@
+import { Field, ObjectType } from "type-graphql";
 import {
   Column,
   Entity,
@@ -8,11 +9,14 @@ import {
 import Skills from "./Skills";
 import Wilder from "./Wilder";
 
+@ObjectType()
 @Entity()
 export default class Grade {
   @PrimaryGeneratedColumn()
+  @Field()
   id: number;
 
+  @Field()
   @Column({ default: 0 })
   vote: number;
 
@@ -20,6 +24,7 @@ export default class Grade {
   @JoinColumn({ name: "wilder_id" })
   wilder!: Wilder;
 
+  @Field(() => Skills)
   @ManyToOne(() => Skills, { eager: true })
   @JoinColumn({ name: "skill_id" })
   skill!: Skills;
