@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  back:
+    container_name: back_wilderbooks
+    build:
+      context: .
+      dockerfile: "Dockerfile.dev"
+    volumes: 
+      - ./:/app:rw,cached
+    ports:
+      - 8000:8000
+        

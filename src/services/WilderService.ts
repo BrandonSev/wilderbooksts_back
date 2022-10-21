@@ -1,4 +1,3 @@
-import { DeleteResult } from "typeorm";
 import Grade from "../models/Grade";
 import Skills from "../models/Skills";
 import Wilder from "../models/Wilder";
@@ -111,16 +110,11 @@ const update = async (id: number, data: WilderType): Promise<Wilder | null> => {
 /**
  * Delete wilder in db or fail if not found
  * @param {int} id
- * @return Promise<DeleteResult>
+ * @return Promise<Boolean>
  */
-const remove = async (id: number): Promise<DeleteResult> => {
-  const wilder = await findOneOrFail(id);
-  if (wilder !== null) {
-    return await repository.delete(id);
-  } else {
-    // eslint-disable-next-line prefer-promise-reject-errors
-    return await Promise.reject("Wilder not found");
-  }
+const remove = async (id: number): Promise<Boolean> => {
+  const { affected } = await repository.delete(id);
+  return affected !== 0;
 };
 
 export default {

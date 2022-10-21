@@ -33,7 +33,6 @@ export default class WilderResolver {
 
   @Mutation(() => Boolean)
   async deleteWilder(@Arg("id") id: number): Promise<Boolean> {
-    await WilderService.remove(id);
-    return true;
+    return await WilderService.remove(id);
   }
 }
